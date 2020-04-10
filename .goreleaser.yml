@@ -23,6 +23,9 @@ builds:
   goarm:
     - 6
     - 7
+  ignore:
+    - goos: darwin
+      goarch: 386
   env:
     - CGO_ENABLED=0
   flags:
@@ -33,9 +36,6 @@ builds:
     -X main.Version={{.Version}}
     -X main.Commit={{.ShortCommit}}
     -X main.Date={{.Date}}
-  ignore:
-    - goos: darwin
-      goarch: 386
   hooks:
     post: find target/dist -name drone-cache -type f -exec upx {} +
 archives:
@@ -83,26 +83,27 @@ changelog:
     - Merge pull request
     - Merge branch
 dockers:
-  -
-    goos: linux
-    goarch: amd64
-    goarm: ''
-    binaries:
-    - drone-cache
-    image_templates:
     # TODO: Add missing GOOS and ARCH
     # .Os	GOOS (usually allow replacements)
     # .Arch	GOARCH (usually allow replacements)
     # .Arm	GOARM (usually allow replacements)
     # .Mips	GOMIPS (usually allow replacements)
-    - "meltwater/drone-cache:latest"
-    - "meltwater/drone-cache:{{ .Tag }}"
-    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
-    - "meltwater/drone-cache:v{{ .Major }}"
+    # TODO: Add github docker repo
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:latest"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:{{ .Tag }}"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}.{{ .Minor }}"
     # - "docker.pkg.github.com/meltwater/drone-cache/drone-cache:v{{ .Major }}"
+  -
+    # goos: linux
+    # goarch: amd64
+    # goarm: ''
+    binaries:
+    - drone-cache
+    image_templates:
+    - "meltwater/drone-cache:latest"
+    - "meltwater/drone-cache:{{ .Tag }}"
+    - "meltwater/drone-cache:v{{ .Major }}.{{ .Minor }}"
+    - "meltwater/drone-cache:v{{ .Major }}"
 
     # Skips the docker push. Could be useful if you also do draft releases.
     # If set to auto, the release will not be pushed to the docker repository
