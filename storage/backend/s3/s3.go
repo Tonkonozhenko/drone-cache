@@ -36,10 +36,13 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		S3ForcePathStyle: aws.Bool(c.PathStyle),
 	}
 
+	sess := session.New()
+
 	if c.Key != "" && c.Secret != "" {
 		conf.Credentials = credentials.NewStaticCredentials(c.Key, c.Secret, "")
 	} else {
-		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to anonymous credentials)")
+		level.Warn(l).Log("msg", "aws key and/or Secret not provided (falling back to session credentials)")
+		conf.Credentials = sess.Config.Credentials
 	}
 
 	level.Debug(l).Log("msg", "s3 backend", "config", fmt.Sprintf("%#v", c))
@@ -48,7 +51,7 @@ func New(l log.Logger, c Config, debug bool) (*Backend, error) {
 		conf.WithLogLevel(aws.LogDebugWithHTTPBody)
 	}
 
-	client := s3.New(session.Must(session.NewSessionWithOptions(session.Options{})), conf)
+	client := s3.New(sess, conf)
 
 	return &Backend{
 		logger:     l,
